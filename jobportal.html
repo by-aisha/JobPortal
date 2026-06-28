@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Job Portal with Enhanced Animations</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-image: url(job9.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .container {
+            color: rgb(48, 12, 12);
+            max-width: 700px;
+            width: 70%;
+            margin: auto;
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* A stronger shadow for emphasis */
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            background: rgba(0, 0, 0, 0.7); /* A darker semi-transparent background */
+            padding: 20px;
+           /* border: 2px solid #ffffff; /* White border for a clean highlighted look */
+            border-radius: 10px;
+            background: transparent;
+            position: absolute;
+            top: 15%;
+            right: 20%;
+          
+        }
+
+        h1 {
+            text-transform: capitalize; /* Makes the text uppercase */
+            font-size: 3em; /* Adjust the size to make it larger */
+            font-weight: bold; /* Ensures the text is bold */
+            letter-spacing: 2px; /* Adds spacing between letters (optional) */
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #878bb9;
+            border-radius: 5px;
+            backdrop-filter: blur(12px);
+            font-size: 16px;
+            font-style: oblique;
+            box-sizing: border-box;
+        }
+        .job-list {
+            margin-top: 20px;
+            text-align: left;
+            transition: 0ms;
+            display: none; /* Default concealment */
+        }
+        .job {
+            background: #141313;
+            background: transparent;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95); /* Slightly scale down */
+            animation: fadeSlideIn 0.5s ease forwards; /* Fade and slide-in effect */
+        }
+        .job.show {
+            opacity: 1;
+            background: transparent;
+            transform: translateY(0) scale(1); /* Fully visible with original size */
+        }
+        .job.top-match {
+            background: #d7e5ec; /* Highlight for "Top Match" */
+            border-left: 5px solid #4caf50;
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .job.top-match:hover {
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.7); /* Glow effect on hover */
+        }
+        .job-details {
+            background: #181919;
+            background: transparent;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-20px); /* Slide in from above */
+            animation: slideFadeIn 0.5s ease forwards; /* Slide and fade-in */
+        }
+
+        /* Keyframes for Job Animations */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes slideFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            input {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1><b>NextGen Career Portal</b> </h1>
+        <h4>Search Jobs by Skills</h4>
+        
+        <!-- Input with Predictive Assistance -->
+        <input list="skills-list" id="skills" placeholder="Type a skill (e.g., Python)">
+        <datalist id="skills-list">
+            <option value="Python">
+            <option value="JavaScript">
+            <option value="Java">
+            <option value="C++">
+            <option value="Node.js">
+            <option value="AWS">
+            <option value="React">
+            <option value="Flutter">
+            <option value="Go">
+            <option value="DevOps">
+        </datalist>
+        
+        <div class="job-list" id="job-results"></div>
+        <div class="job-details" id="job-details"></div>
+    </div>
+    <script>
+        const jobs = [
+            { title: "Software Engineer", skills: ["python", "javascript"], company: "Google", link: "https://careers.google.com" },
+            { title: "Web Developer", skills: ["html", "css", "javascript"], company: "Amazon", link: "https://amazon.jobs" },
+            { title: "Backend Developer", skills: ["java", "spring"], company: "Microsoft", link: "https://careers.microsoft.com" },
+            { title: "Frontend Developer", skills: ["react", "javascript"], company: "Facebook", link: "https://www.metacareers.com" },
+            { title: "Data Scientist", skills: ["python", "ml"], company: "Netflix", link: "https://jobs.netflix.com" },
+            { title: "C++ Developer", skills: ["c++", "algorithms"], company: "Bloomberg", link: "https://bloomberg.com/careers" },
+            { title: "AWS Engineer", skills: ["aws", "cloud"], company: "IBM", link: "https://ibm.com/jobs" }
+        ];
+    
+
+        document.getElementById("skills").addEventListener("input", searchJobs);
+
+        function searchJobs() {
+            const skill = document.getElementById("skills").value.trim().toLowerCase();
+            const jobResults = document.getElementById("job-results");
+            const jobDetails = document.getElementById("job-details");
+
+            if (skill.length < 1) {
+                jobResults.innerHTML = "";
+                jobResults.style.display = "none";
+                jobDetails.style.display = "none";
+                return;
+            }
+
+            const filteredJobs = jobs.filter(job => job.skills.some(s => s.includes(skill)));
+
+            if (filteredJobs.length === 0) {
+                jobResults.innerHTML = "<p>No jobs found.</p>";
+                jobResults.style.display = "block";
+                return;
+            }
+
+            filteredJobs.sort((a, b) => {
+                const relevanceA = a.skills.filter(s => skill.includes(s)).length / a.skills.length;
+                const relevanceB = b.skills.filter(s => skill.includes(s)).length / b.skills.length;
+                return relevanceB - relevanceA;
+            });
+
+            jobResults.innerHTML = "";
+            jobResults.style.display = "block";
+
+            filteredJobs.forEach((job, index) => {
+                const matchingSkills = job.skills.filter(s => skill.includes(s));
+                const matchPercentage = (matchingSkills.length / job.skills.length) * 100;
+
+                const jobElement = document.createElement("div");
+                jobElement.className = "job";
+                if (matchPercentage >= 80) jobElement.classList.add("top-match");
+                jobElement.classList.add("show");
+
+                jobElement.innerHTML = `<strong>${job.title}</strong> at <em>${job.company}</em><br>
+                    <a href="#" data-index="${index}" class="view-job">View Job</a>`;
+                jobResults.appendChild(jobElement);
+            });
+
+            document.querySelectorAll(".view-job").forEach(link => {
+                link.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    const jobIndex = this.getAttribute("data-index");
+                    displayJobDetails(jobIndex);
+                });
+            });
+        }
+
+        function displayJobDetails(index) {
+            const job = jobs[index];
+            const jobDetails = document.getElementById("job-details");
+            jobDetails.style.display = "block";
+            jobDetails.innerHTML = `
+                <h3>${job.title}</h3>
+                <p><strong>Company:</strong> ${job.company}</p>
+                <p><strong>Required Skills:</strong> ${job.skills.join(", ")}</p>
+                <p><a href="${job.link}" target="_blank">Apply Here</a></p>
+            `;
+        }
+    </script>
+</body>
+</html>
